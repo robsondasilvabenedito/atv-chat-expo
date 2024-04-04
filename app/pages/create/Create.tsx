@@ -157,7 +157,8 @@ const Create = ({ navigation }: any) => {
                 <DefaultTextInput
                     value={email}
                     setValue={setEmail}
-                    hintText="E-mail" />
+                    hintText="E-mail"
+                    type="normal" />
                 <DefaultErrorLabel errorText="Email Inválido" hasError={emailError} marginTop={5} marginBottom={15} />
 
                 <DefaultTextInput
@@ -165,14 +166,16 @@ const Create = ({ navigation }: any) => {
                     setValue={setSenha}
                     hintText="Senha"
                     marginTop={10}
-                    marginBottom={10} />
+                    marginBottom={10}
+                    type="normal" />
                 <DefaultErrorLabel errorText="Senha Inválido" hasError={senhaError} marginTop={5} marginBottom={15} />
 
                 <DefaultTextInput
                     value={confSenha}
                     setValue={setConfSenha}
                     hintText="Confirmar Senha"
-                    marginBottom={(confSenhaError) ? 0 : 20} />
+                    marginBottom={(confSenhaError) ? 0 : 20}
+                    type="normal" />
                 <DefaultErrorLabel errorText="Senhas Diferentes" hasError={confSenhaError} marginTop={5} marginBottom={15} />
 
                 <DefaultCheckBox options={checkBox} setOptions={setCheckBox} type="one" />

@@ -152,6 +152,7 @@ const Home = ({ navigation }: any) => {
                 <DefaultTextInput
                     value={email}
                     setValue={setEmail}
+                    type="normal"
                     hintText="E-mail" />
                 <DefaultErrorLabel errorText="Email Inválido" hasError={emailError} marginTop={5} marginBottom={15} />
 
@@ -160,6 +161,7 @@ const Home = ({ navigation }: any) => {
                     setValue={setSenha}
                     hintText="Senha"
                     marginTop={10}
+                    type="senha"
                     marginBottom={(loginError || senhaError) ? 0 : 20} />
                 <DefaultErrorLabel errorText="Senha Inválida" hasError={senhaError} marginTop={5} marginBottom={15} />
                 <DefaultErrorLabel errorText="Login Inválido" hasError={loginError} marginTop={5} marginBottom={15} />

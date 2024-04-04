@@ -5,6 +5,7 @@ interface PropsDefaultTextInput {
     value: string
     hintText?: string
     setValue: (value: string) => void
+    type: "normal" | "senha"
     marginTop?: DimensionValue
     marginBottom?: DimensionValue
 }
@@ -13,6 +14,8 @@ const DefaultTextInput = (props: PropsDefaultTextInput) => {
     const value = props.value
     const hintText = props.hintText
     const setValue = props.setValue
+
+    const type = props.type
 
     const marginTop = props.marginTop
     const marginBottom = props.marginBottom
@@ -40,7 +43,8 @@ const DefaultTextInput = (props: PropsDefaultTextInput) => {
                 style={styles.input}
                 value={value}
                 onChangeText={setValue}
-                placeholder={hintText} />
+                placeholder={hintText}
+                secureTextEntry={type == "senha" ? true : false} />
         </View>
     </View>
 }
