@@ -5,12 +5,15 @@ interface PropsDefaultButton {
     onPress: () => void
     text: string
     type: "claro" | "escuro"
+    width?: DimensionValue
     marginTop?: DimensionValue
     marginBottom?: DimensionValue
 }
 
 const DefaultButton = (props: PropsDefaultButton) => {
     const text = props.text
+
+    const width = props.width
 
     const onPress = props.onPress
 
@@ -21,8 +24,9 @@ const DefaultButton = (props: PropsDefaultButton) => {
 
     const styles = StyleSheet.create({
         button: {
-            width: "90%",
+            width: width,
             height: 40,
+            paddingHorizontal: 6,
             backgroundColor: type === "claro" ? Theme.button1 : Theme.button2,
             justifyContent: "center",
             marginTop: marginTop,

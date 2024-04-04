@@ -19,7 +19,7 @@ const SendButton = (props: SendButtonProps) => {
             width: width,
             marginLeft: 5,
             paddingHorizontal: 3,
-            backgroundColor: Theme.fg1,
+            backgroundColor: Theme.button2,
             borderRadius: 15,
         }
     })
@@ -28,7 +28,7 @@ const SendButton = (props: SendButtonProps) => {
         activeOpacity={0.8}
         style={styles.inputButton}
         onPress={onPress}>
-        <MaterialCommunityIcons name="send-check" size={24} color="black" />
+        <MaterialCommunityIcons name="send-check" size={24} color={Theme.button1} />
     </TouchableOpacity>
 }
 

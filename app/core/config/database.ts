@@ -42,11 +42,19 @@ export const initDB = async () => {
     // Contact
     await db.executeSql("CREATE TABLE IF NOT EXISTS Contacts(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, password TEXT, type TEXT)")
 
-    await dbCreateContact({ name: "lucas", type: "aluno", password: "111111" })
-    await dbCreateContact({ name: "marcos", type: "professor", password: "222222" })
-    await dbCreateContact({ name: "luan", type: "aluno", password: "333333" })
-    await dbCreateContact({ name: "maria", type: "professor", password: "444444" })
-    await dbCreateContact({ name: "vitoria", type: "aluno", password: "555555" })
+    await dbCreateContact({ name: "lucas@ifpr", type: "aluno", password: "111111" })
+    await dbCreateContact({ name: "marcos@ifpr", type: "professor", password: "222222" })
+    await dbCreateContact({ name: "luan@ifpr", type: "aluno", password: "333333" })
+    await dbCreateContact({ name: "maria@ifpr", type: "professor", password: "444444" })
+    await dbCreateContact({ name: "vitoria@ifpr", type: "aluno", password: "555555" })
+
+    // Messages
+    await db.executeSql("CREATE TABLE IF NOT EXISTS Messages(id INTEGER PRIMARY KEY AUTOINCREMENT, contactId INTEGER NOT NULL, text TEXT NOT NULL, timestamp TEXT NOT NULL, FOREIGN KEY (contactId) REFERENCES Contacts(id))")
+
+    await dbCreateMessage({ contactId: 1, text: "ola", timestamp: new Date().toString() })
+    await dbCreateMessage({ contactId: 2, text: "ola", timestamp: new Date().toString() })
+    await dbCreateMessage({ contactId: 1, text: "estou com duvida em uma questão", timestamp: new Date().toString() })
+    await dbCreateMessage({ contactId: 2, text: "qual?", timestamp: new Date().toString() })
 }
 
 /**
@@ -103,6 +111,13 @@ export const dbGetContacts = async () => {
     return contacts
 }
 
+/**
+ * Login
+ *
+ * @param name email
+ * @param password password
+ * @returns Contact
+ */
 export const dbLogin = async (name: string, password: string): Promise<Contact> => {
     const db = await getDB()
 
@@ -119,4 +134,38 @@ export const dbLogin = async (name: string, password: string): Promise<Contact> 
     }
 
     return contacts.length == 0 ? { id: 0, name: "", type: "aluno" } : contacts[0]
+}
+
+/**
+ * Create Message
+ *
+ * @param message Message
+ */
+export const dbCreateMessage = async (message: Message) => {
+    const db = await getDB()
+
+    await db.executeSql("INSERT INTO Messages (contactId, text, timestamp) VALUES (?, ?, ?)", [message.contactId, message.text, message.timestamp.toString()])
+}
+
+/**
+ * Get Messages
+ *
+ * @returns Messages
+ */
+export const dbGetMessages = async (): Promise<Message[]> => {
+    const db = await getDB()
+
+    // messages
+    const messages: Message[] = []
+
+    // result
+    const result: SQLite.ResultSet = (await db.executeSql("SELECT * FROM Messages"))[0]
+
+    for (let i = 0; i < result.rows.length; i++) {
+        let message = result.rows.item(i) as Message
+
+        messages.push(message)
+    }
+
+    return messages
 }

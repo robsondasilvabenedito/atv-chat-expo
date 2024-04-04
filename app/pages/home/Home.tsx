@@ -1,20 +1,22 @@
-import { FlatList, KeyboardAvoidingView, ListRenderItem, Platform, SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native"
+import { ListRenderItem, SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native"
 import { Message } from "../../core/model/message"
 import { Theme } from "../../core/config/theme"
 import { DefaultTextInput } from "../../core/components/textInput"
-import { useEffect, useState } from "react"
+import { createRef, useEffect, useRef, useState } from "react"
 import { DefaultButton } from "../../core/components/button"
-import { initDB } from "../../core/config/database"
+import { dbLogin, initDB } from "../../core/config/database"
 import { useDispatch, useSelector } from "react-redux"
 import { storeStateType } from "../../core/redux"
+import { getContacts, getMessages, setLogin } from "../../core/redux/redux.store"
+import DefaultErrorLabel from "../../core/components/error/DefaultErrorLabel"
 
 const styles = StyleSheet.create({
     container: {
         backgroundColor: Theme.bg2,
-        flex: 1
+        height: "100%",
     },
-    keybord: {
-        flex: 1,
+    view: {
+        width: "100%",
         alignItems: "center"
     },
     containerText: {
@@ -34,11 +36,12 @@ const styles = StyleSheet.create({
         fontSize: 18,
         textAlign: "center",
         fontWeight: "300",
+        marginBottom: 10
     },
     image: {
         height: 190,
         width: 190,
-        marginTop: 30,
+        marginTop: 40,
         backgroundColor: Theme.bg1
     }
 })
@@ -50,6 +53,8 @@ const Home = ({ navigation }: any) => {
     const [emailError, setEmailError] = useState(false)
     const [senhaError, setSenhaError] = useState(false)
 
+    const [loginError, setLoginError] = useState(false)
+
     // redux
     const stock = useSelector((state: storeStateType) => state.stock)
     const dispatch = useDispatch<any>()
@@ -58,11 +63,14 @@ const Home = ({ navigation }: any) => {
 
     // init
     useEffect(() => {
-        initDB()
+        init()
     }, [])
 
     const init = async () => {
         await initDB()
+
+        dispatch(getContacts())
+        dispatch(getMessages())
     }
 
     // render
@@ -73,14 +81,17 @@ const Home = ({ navigation }: any) => {
     })
 
     // login
-    const login = () => {
+    const login = async () => {
         let hasError = false
 
         setEmailError(false)
         setSenhaError(false)
+        setLoginError(false)
 
         // validate
-        if (email === "") {
+        let regex: RegExp = /^\S+@\S*ifpr\S*/
+
+        if (email === "" || !regex.test(email)) {
             hasError = true
             setEmailError(true)
         }
@@ -97,39 +108,66 @@ const Home = ({ navigation }: any) => {
         }
 
         // ok
-        console.log(`Login ${email}, Senha: ${senha}`)
-        navigation.navigate("/messages")
+        let login = await dbLogin(email.toLocaleLowerCase(), senha)
+
+        if (login.id == 0) {
+            setLoginError(true)
+            return
+        } else {
+            console.log(`Login: ${login.name} - ${login.type}`)
+            dispatch(setLogin(login))
+            navigation.navigate("/messages")
+        }
     }
 
+    // create
+    const create = () => {
+        navigation.navigate("/create")
+    }
+
+    // autoScroll
+    const listRef = createRef<ScrollView>()
+
+    const autoScroll = () => {
+        listRef.current?.scrollToEnd({ animated: true })
+    }
+
+    useEffect(() => {
+        autoScroll()
+    }, [loginError, emailError, senhaError])
+
     return <SafeAreaView style={styles.container}>
-        <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
-            style={styles.keybord}
+        <ScrollView
+            ref={listRef}
+            onLayout={autoScroll}
+            keyboardShouldPersistTaps={"always"}
         >
-            <View style={styles.image} />
-            <View style={styles.containerText}>
-                <Text style={styles.textTitle}>Acesso ao Chat</Text>
-                <Text style={styles.textBody} >Use seu e-email e senha cadastrados para acessar o painel de conversas</Text>
+            <View style={styles.view}>
+                <View style={styles.image} />
+                <View style={styles.containerText}>
+                    <Text style={styles.textTitle}>Acesso ao Chat</Text>
+                    <Text style={styles.textBody} >Use seu e-email e senha cadastrados para acessar o painel de conversas</Text>
+                </View>
+
+                <DefaultTextInput
+                    value={email}
+                    setValue={setEmail}
+                    hintText="E-mail" />
+                <DefaultErrorLabel errorText="Email Inválido" hasError={emailError} marginTop={5} marginBottom={15} />
+
+                <DefaultTextInput
+                    value={senha}
+                    setValue={setSenha}
+                    hintText="Senha"
+                    marginTop={10}
+                    marginBottom={(loginError || senhaError) ? 0 : 20} />
+                <DefaultErrorLabel errorText="Senha Inválida" hasError={senhaError} marginTop={5} marginBottom={15} />
+                <DefaultErrorLabel errorText="Login Inválido" hasError={loginError} marginTop={5} marginBottom={15} />
+
+                <DefaultButton onPress={() => { login() }} text="Login" type="claro" marginBottom={10} width={"90%"} />
+                <DefaultButton onPress={() => { create() }} text="Cadastrar" type="escuro" width={"90%"} marginBottom={20} />
             </View>
-
-            <DefaultTextInput
-                value={email}
-                setValue={setEmail}
-                hintText="E-mail"
-                errorText="Email Invalido"
-                hasError={emailError} />
-            <DefaultTextInput
-                value={senha}
-                setValue={setSenha}
-                hintText="Senha"
-                errorText="Senha Invalida"
-                hasError={senhaError}
-                marginTop={10}
-                marginBottom={20} />
-
-            <DefaultButton onPress={() => { login() }} text="Login" type="claro" marginBottom={10} />
-            <DefaultButton onPress={() => { }} text="Cadastrar" type="escuro" />
-        </KeyboardAvoidingView>
+        </ScrollView>
     </SafeAreaView>
 }
 

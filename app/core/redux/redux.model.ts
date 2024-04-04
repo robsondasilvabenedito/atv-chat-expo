@@ -3,6 +3,8 @@ import { Message } from "../model/message"
 
 export interface StateType {
     me: Contact
-    contacts: Contact[] 
-    messages: Message[]
+    contacts: Contact[]
+    msgAll: Message[]
+    msgProfessor: Message[]
+    msgAlunos: Message[]
 }

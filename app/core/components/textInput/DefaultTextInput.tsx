@@ -5,8 +5,6 @@ interface PropsDefaultTextInput {
     value: string
     hintText?: string
     setValue: (value: string) => void
-    errorText?: string
-    hasError?: boolean
     marginTop?: DimensionValue
     marginBottom?: DimensionValue
 }
@@ -18,9 +16,6 @@ const DefaultTextInput = (props: PropsDefaultTextInput) => {
 
     const marginTop = props.marginTop
     const marginBottom = props.marginBottom
-
-    const errorText = props.errorText
-    const hasError = props.hasError ? props.hasError : false
 
     const styles = StyleSheet.create({
         container: {
@@ -37,13 +32,6 @@ const DefaultTextInput = (props: PropsDefaultTextInput) => {
         input: {
             height: "100%"
         },
-        errorLabel: {
-            marginTop: 5,
-            marginLeft: 6
-        },
-        error: {
-            color: "#aa0a0c"
-        }
     })
 
     return <View style={styles.container}>
@@ -54,12 +42,6 @@ const DefaultTextInput = (props: PropsDefaultTextInput) => {
                 onChangeText={setValue}
                 placeholder={hintText} />
         </View>
-        {hasError ?
-            <View style={styles.errorLabel}>
-                <Text style={styles.error}>{errorText}</Text>
-            </View>
-            :
-            <></>}
     </View>
 }
 
